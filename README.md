@@ -32,7 +32,8 @@ categories from being evaluated.
 
 The mock mode has no model or network dependency. It validates trial execution,
 scoring, audit integrity, and output generation; mock outcomes are **not model
-evidence**.
+evidence**. Offline validation confirms harness mechanics only; live-model
+results require a configured backend.
 
 ```bash
 python3 oit.py --selftest
@@ -54,8 +55,9 @@ ollama pull qwen2.5:1.5b-instruct
 ollama pull qwen2.5:3b-instruct
 ollama pull llama3.2:3b
 ollama pull gemma2:2b
-ollama serve
 ```
+
+Start `ollama serve` in a separate terminal before running the live commands.
 
 Example exploratory matrix: 100 trials on each of two paths for each model
 (200 trials per model, 800 total). This command is opt-in and makes live
@@ -80,6 +82,29 @@ Each model writes separate files, such as
 names depend on what the configured endpoint provides. For another
 OpenAI-compatible endpoint, set `OIT_API_KEY`, `OIT_BASE_URL`, and either
 `OIT_MODEL` or `--models`.
+
+### Single-model OpenAI-compatible endpoint
+
+For Ollama, the `OIT_API_KEY` value can be any nonempty string such as `ollama`.
+For hosted endpoints, set the actual API key. These commands are opt-in:
+
+```bash
+# Ollama; 200 trials per path for each model (800 trials total)
+ollama pull qwen2.5:3b-instruct
+ollama pull qwen2.5:1.5b-instruct
+OIT_API_KEY=ollama OIT_BASE_URL=http://127.0.0.1:11434/v1 \
+python3 oit.py \
+  --models qwen2.5:3b-instruct,qwen2.5:1.5b-instruct \
+  --trials 200 --path both --seed 42 \
+  --timeout 300 --retries 2 --out runs/live-qwen-matrix.json
+
+# Any OpenAI-compatible endpoint, one target model
+export OIT_API_KEY="your-api-key"
+export OIT_BASE_URL="https://api.example.com/v1"
+export OIT_MODEL="your-model-id"
+python3 oit.py --trials 200 --path both --seed 42 \
+  --timeout 300 --retries 2 --out runs/live-single-model.json
+```
 
 ### CLI options
 
