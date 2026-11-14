@@ -57,7 +57,11 @@ ollama pull llama3.2:3b
 ollama pull gemma2:2b
 ```
 
-Start `ollama serve` in a separate terminal before running the live commands.
+Start the local server in a separate terminal:
+
+```bash
+ollama serve
+```
 
 Example exploratory matrix: 100 trials on each of two paths for each model
 (200 trials per model, 800 total). This command is opt-in and makes live
